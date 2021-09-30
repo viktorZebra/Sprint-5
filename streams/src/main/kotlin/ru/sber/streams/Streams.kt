@@ -19,7 +19,7 @@ fun Shop.allOrderedProducts(): Set<Product> = customers.flatMap { customer -> cu
 fun Shop.getCustomerWithMaximumNumberOfOrders(): Customer? = customers.maxByOrNull { it.orders.size }!!
 
 // 6. Получить самый дорогой продукт, когда-либо приобретенный покупателем.
-fun Customer.getMostExpensiveProduct(): Product? = orders.map { order -> order.products.maxByOrNull { it.price } }.maxByOrNull { it!!.price }
+fun Customer.getMostExpensiveProduct(): Product? = orders.flatMap { it.products }.maxWithOrNull(compareBy { it.price })
 
 // 7. Получить соответствие в мапе: город - количество заказанных и доставленных продуктов в данный город.
 fun Shop.getNumberOfDeliveredProductByCity(): Map<City, Int> = customers.map { customer ->
@@ -38,11 +38,5 @@ fun Shop.getMostPopularProductInCity(): Map<City, Product> = customers.map { cus
     .toMap()
 
 // 9. Получить набор товаров, которые заказывали все покупатели.
-fun Shop.getProductsOrderedByAll(): Set<Product> = customers.asSequence().map { customer ->
-    Pair(customer, customer.orders) }
-    .map { pair -> Pair(pair.first, pair.second.map { it.products }.flatMap { it.distinct() }.distinct()) }
-    .groupBy { it.first }
-    .map { entry -> entry.value.flatMap { it.second }.toSet() }
-    .distinct()
-    .reduce{ acc, set ->  acc.intersect(set)}
+fun Shop.getProductsOrderedByAll(): Set<Product> = emptySet()
 
